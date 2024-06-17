@@ -1,5 +1,5 @@
 ```
-00- echo "192.168.5.241 hub.packops.local" >> /etc/hosts
+00- echo "192.168.5.241 hub.rez4sadi.local" >> /etc/hosts
 ```
 01- Change External url to http (in http mode behind nginx )
 vim common/config/core/env
@@ -13,7 +13,7 @@ tar xvf harbor-offline-installer-v2.9.1.tgz
 
 # 2- Get Certificate with Lets Encrypt 
 ```
- sudo certbot certonly --standalone --preferred-challenges http --agree-tos --email mrnickfetrat@gmail.com -d  hub.packops.dev
+ sudo certbot certonly --standalone --preferred-challenges http --agree-tos --email rez4sadi@gmail.com -d  hub.rez4sadi.dev
  
  ```
  
@@ -26,14 +26,14 @@ cd /opt/cert
 
 openssl genrsa -out ca.key 4096
 openssl req -x509 -new -nodes -sha512 -days 3650 \
- -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=hub.packops.local" \
+ -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=hub.rez4sadi.local" \
  -key ca.key \
  -out ca.crt
-openssl genrsa -out hub.packops.local.key 4096
+openssl genrsa -out hub.rez4sadi.local.key 4096
 openssl req -sha512 -new \
-    -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=hub.packops.local" \
-    -key hub.packops.local.key \
-    -out hub.packops.local.csr
+    -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=hub.rez4sadi.local" \
+    -key hub.rez4sadi.local.key \
+    -out hub.rez4sadi.local.csr
 
 cat > v3.ext <<-EOF
 authorityKeyIdentifier=keyid,issuer
@@ -43,15 +43,15 @@ extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1=hub.packops.local
-DNS.2=hub.packops.local
+DNS.1=hub.rez4sadi.local
+DNS.2=hub.rez4sadi.local
 DNS.3=hostname
 EOF
 openssl x509 -req -sha512 -days 3650 \
     -extfile v3.ext \
     -CA ca.crt -CAkey ca.key -CAcreateserial \
-    -in hub.packops.local.csr \
-    -out hub.packops.local.crt
+    -in hub.rez4sadi.local.csr \
+    -out hub.rez4sadi.local.crt
 
 
 
@@ -60,17 +60,17 @@ openssl x509 -req -sha512 -days 3650 \
 ```
 docker run -it  --privileged  --name my-dind-container11 -v /var/run/docker.sock:/var/run/docker.sock docker:dind sh
 echo "192.168.6.252 hub.packops.local" >> /etc/hosts
-openssl s_client -showcerts -connect hub.packops.local:443 </dev/null | openssl x509 -outform PEM > ca.crt
+openssl s_client -showcerts -connect hub.rez4sadi.local:443 </dev/null | openssl x509 -outform PEM > ca.crt
 cat ca.crt >> /etc/ssl/certs/ca-certificates.crt
 mkdir ~/.docker/
 echo '{
         "auths": {
-                "hub.packops.local": {
+                "hub.rez4sadi.local": {
                         "auth": "YWRtaW46SGFyYm9yMTIzNDU="
                 }
         }
 }' > ~/.docker/config.json
-docker login hub.packops.local
+docker login hub.rez4sadi.local
 ```
 
 # 5- Add configs in harbor.yml
@@ -79,8 +79,8 @@ https:
   # https port for harbor, default is 443
     port: 443
   # The path of cert and key files for nginx
-    certificate: /opt/cert/hub.packops.local.crt
-    private_key: /opt/cert/hub.packops.local.key
+    certificate: /opt/cert/hub.rez4sadi.local.crt
+    private_key: /opt/cert/hub.rez4sadi.local.key
 
 
 
@@ -105,5 +105,5 @@ bash prepare
 bash install.sh
 ```
 
-``If you harbor is in Local make sure your domain name match with your server (make a host for you domain ) in my case 192.168.4.210 hub.packops.dev >> /etc/hosts ``
+``If you harbor is in Local make sure your domain name match with your server (make a host for you domain ) in my case 192.168.4.210 hub.rez4sadi.dev >> /etc/hosts ``
 
